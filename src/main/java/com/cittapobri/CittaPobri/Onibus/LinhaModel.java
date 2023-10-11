@@ -1,5 +1,6 @@
 package com.cittapobri.CittaPobri.Onibus;
 
+import com.cittapobri.CittaPobri.Empresas.Empresas;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,6 @@ public class LinhaModel {
     private String codigo;
     private String nome;
     private double tarifa;
+    private Empresas empresa;
+   // private boolean ativo = true;
 }

@@ -1,5 +1,6 @@
 package com.cittapobri.CittaPobri.Onibus;
 
+import com.cittapobri.CittaPobri.Onibus.dto.AtualizarLinha;
 import com.cittapobri.CittaPobri.Onibus.dto.ExibirLinha;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,12 @@ public class LinhaController {
     public ResponseEntity<Page<ExibirLinha>> buscarTodasAsLinhasAtivas(@PageableDefault(sort = "codigo") Pageable page) {
         var linhas = repository.findAll(page).map(ExibirLinha::new);
         return ResponseEntity.ok(linhas);
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<AtualizarLinha> atualizarLinha(@RequestBody AtualizarLinha dados) {
+        return service.editarLinha(dados);
     }
 
 }

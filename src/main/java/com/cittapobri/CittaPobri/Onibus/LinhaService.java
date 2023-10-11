@@ -1,5 +1,6 @@
 package com.cittapobri.CittaPobri.Onibus;
 
+import com.cittapobri.CittaPobri.Onibus.dto.AtualizarLinha;
 import com.cittapobri.CittaPobri.Onibus.dto.ExibirLinha;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,5 +30,20 @@ public class LinhaService {
             return ResponseEntity.ok(new ExibirLinha(linha));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    public ResponseEntity<AtualizarLinha> editarLinha(AtualizarLinha linha) {
+        LinhaModel linhaModel = repository.findAllByCodigo(linha.codigo());
+        if(linha.nome() != null && !linha.nome().equals("")) {
+            linhaModel.setNome(linha.nome());
+        }
+        if(linha.tarifa() > 0) {
+            linhaModel.setTarifa(linha.tarifa());
+        }
+        if(linha.empresa() != null) {
+            linhaModel.setEmpresa(linha.empresa());
+        }
+        repository.save(linhaModel);
+        return ResponseEntity.noContent().build();
     }
 }
