@@ -1,18 +1,27 @@
 package com.cittapobri.CittaPobri.Onibus;
 
+import com.cittapobri.CittaPobri.Empresas.EmpresaRepository;
+import com.cittapobri.CittaPobri.Empresas.EmpresaService;
 import com.cittapobri.CittaPobri.Onibus.dto.AtualizarLinha;
 import com.cittapobri.CittaPobri.Onibus.dto.ExibirLinha;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class LinhaService {
 
     private final LinhaRepository repository;
+    private final EmpresaRepository empresaRepository;
+    private final EmpresaService empresaService;
 
-
-    public LinhaService(LinhaRepository repository) {
+    public LinhaService(LinhaRepository repository, EmpresaRepository empresaRepository, EmpresaService empresaService) {
         this.repository = repository;
+        this.empresaRepository = empresaRepository;
+        this.empresaService = empresaService;
     }
 
     public ResponseEntity<LinhaModel> deletar(String codigo) {
@@ -24,12 +33,10 @@ public class LinhaService {
         return ResponseEntity.notFound().build();
     }
 
-    public ResponseEntity<ExibirLinha> buscarLinhaPorCodigo(String codigo) {
+    public ExibirLinha buscarLinhaPorCodigo(String codigo) {
         var linha = repository.findAllByCodigo(codigo);
-        if(linha != null) {
-            return ResponseEntity.ok(new ExibirLinha(linha));
-        }
-        return ResponseEntity.notFound().build();
+        var empresa = empresaRepository.findEmpresaModelById(linha.getEmpresa_id());
+        return new ExibirLinha(linha.getCodigo(), linha.getNome(), linha.getTarifa(), empresa.getNome());
     }
 
     public ResponseEntity<AtualizarLinha> editarLinha(AtualizarLinha linha) {
@@ -40,10 +47,18 @@ public class LinhaService {
         if(linha.tarifa() > 0) {
             linhaModel.setTarifa(linha.tarifa());
         }
-        if(linha.empresa() != null) {
-            linhaModel.setEmpresa(linha.empresa());
-        }
         repository.save(linhaModel);
         return ResponseEntity.noContent().build();
     }
+
+    public List<ExibirLinha> buscarTodasAsLinhas(Pageable pageable) {
+        var linhas = repository.findAllByAtivoTrue(pageable);
+        List<ExibirLinha> detalhes = new ArrayList<>();
+        for(LinhaModel linhaModel: linhas) {
+            detalhes.add(new ExibirLinha(linhaModel.getCodigo(), linhaModel.getNome(),
+                    linhaModel.getTarifa(), empresaService.nomeEmpresa(linhaModel.getEmpresa_id())));
+        }
+        return detalhes;
+    }
+
 }

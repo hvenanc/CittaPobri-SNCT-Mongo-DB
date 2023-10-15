@@ -2,7 +2,6 @@ package com.cittapobri.CittaPobri.Onibus;
 
 import com.cittapobri.CittaPobri.Onibus.dto.AtualizarLinha;
 import com.cittapobri.CittaPobri.Onibus.dto.ExibirLinha;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -42,12 +41,19 @@ public class LinhaController {
 
     @GetMapping("/{codigo}")
     public ResponseEntity<ExibirLinha> buscarLinha(@PathVariable String codigo) {
-        return service.buscarLinhaPorCodigo(codigo);
+        var linha = service.buscarLinhaPorCodigo(codigo);
+        return ResponseEntity.ok(linha);
     }
 
+//    @GetMapping
+//    public ResponseEntity<Page<ExibirLinha>> buscarTodasAsLinhasAtivas(@PageableDefault(sort = "codigo") Pageable page) {
+//        var linhas = repository.findAll(page).map(ExibirLinha::new);
+//        return ResponseEntity.ok(linhas);
+//    }
+
     @GetMapping
-    public ResponseEntity<Page<ExibirLinha>> buscarTodasAsLinhasAtivas(@PageableDefault(sort = "codigo") Pageable page) {
-        var linhas = repository.findAll(page).map(ExibirLinha::new);
+    public ResponseEntity<?> buscarTodas(@PageableDefault(sort = "codigo")Pageable pageable) {
+        var linhas = service.buscarTodasAsLinhas(pageable);
         return ResponseEntity.ok(linhas);
     }
 
